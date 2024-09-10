@@ -27,28 +27,39 @@ public class MainService {
 
     @Transactional(readOnly = true)
     public List<ViewStats> getViewStats(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
-        List<ViewStats> viewStatsList = new ArrayList<>();
+        List<ViewStats> viewStatsList;
+
         if (uris == null) {
+            // Если URI не указаны, получаем все статистики.
             if (unique) {
-                viewStatsList = repository.getAllViewStats(start, end);
-            } else {
                 viewStatsList = repository.getAllViewStatsUnique(start, end);
+            } else {
+                viewStatsList = repository.getAllViewStats(start, end);
             }
         } else {
+            // Если URI указаны, делаем один запрос на все URI сразу
+            List<String> uriList = Arrays.asList(uris);
+
+            // Получаем статистику по каждому URI в зависимости от флага unique
+            viewStatsList = new ArrayList<>();
             if (unique) {
-                for (String s : uris) {
-                    ViewStats viewStats = repository.getViewStatsUnique(start, end, s);
-                    viewStatsList.add(Objects.requireNonNullElseGet(viewStats, () -> new ViewStats("ewm-main-service", s, 0L)));
+                for (String uri : uriList) {
+                    ViewStats stats = repository.getViewStatsUnique(start, end, uri);
+                    viewStatsList.add(Objects.requireNonNullElseGet(stats, () -> new ViewStats("ewm-main-service", uri, 0L)));
                 }
             } else {
-                for (String s : uris) {
-                    ViewStats viewStats = repository.getViewStats(start, end, s);
-                    viewStatsList.add(Objects.requireNonNullElseGet(viewStats, () -> new ViewStats("ewm-main-service", s, 0L)));
+                for (String uri : uriList) {
+                    ViewStats stats = repository.getViewStats(start, end, uri);
+                    viewStatsList.add(Objects.requireNonNullElseGet(stats, () -> new ViewStats("ewm-main-service", uri, 0L)));
                 }
             }
         }
+
+        // Сортируем статистику по количеству хитов
         viewStatsList.sort(Comparator.comparing(ViewStats::getHits).reversed());
+
         log.info("GET /stats -> returning from db {}", viewStatsList);
         return viewStatsList;
     }
 }
+

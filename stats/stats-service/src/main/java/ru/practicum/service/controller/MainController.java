@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping
 @RequiredArgsConstructor
 @Slf4j
 public class MainController {
