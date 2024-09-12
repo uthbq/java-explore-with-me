@@ -37,29 +37,18 @@ public class MainService {
                 viewStatsList = repository.getAllViewStats(start, end);
             }
         } else {
-            // Если URI указаны, делаем один запрос на все URI сразу
             List<String> uriList = Arrays.asList(uris);
-
-            // Получаем статистику по каждому URI в зависимости от флага unique
-            viewStatsList = new ArrayList<>();
             if (unique) {
-                for (String uri : uriList) {
-                    ViewStats stats = repository.getViewStatsUnique(start, end, uri);
-                    viewStatsList.add(Objects.requireNonNullElseGet(stats, () -> new ViewStats("ewm-main-service", uri, 0L)));
-                }
+                viewStatsList = repository.getViewStatsForUrisUnique(start, end, uriList);
             } else {
-                for (String uri : uriList) {
-                    ViewStats stats = repository.getViewStats(start, end, uri);
-                    viewStatsList.add(Objects.requireNonNullElseGet(stats, () -> new ViewStats("ewm-main-service", uri, 0L)));
-                }
+                viewStatsList = repository.getViewStatsForUris(start, end, uriList);
             }
         }
-
-        // Сортируем статистику по количеству хитов
         viewStatsList.sort(Comparator.comparing(ViewStats::getHits).reversed());
 
         log.info("GET /stats -> returning from db {}", viewStatsList);
         return viewStatsList;
     }
+
 }
 
