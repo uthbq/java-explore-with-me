@@ -23,3 +23,4 @@ public interface HitRepository extends JpaRepository<EndpointHit, Long> {
     List<ViewStats> getViewStatsForUrisUnique(LocalDateTime start, LocalDateTime end, List<String> uris);
 
 }
+
