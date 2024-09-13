@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.models.dto.EndpointHitDto;
 import ru.practicum.models.dto.ViewStats;
+import ru.practicum.service.exception.IncorrectDateException;
 import ru.practicum.service.model.mapper.EndpointHitMapper;
 import ru.practicum.service.repository.HitRepository;
 
