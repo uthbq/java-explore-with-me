@@ -1,0 +1,291 @@
+{
+	"info": {
+		"_postman_id": "34021373-0373-4e49-81e6-97f9bd96a55c",
+		"name": "Stats-Service Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34416366",
+		"_collection_link": "https://yandex-practicum-5899.postman.co/workspace/Yandex-Practicum-Workspace~54fe1260-13d0-4dc4-892e-eb6dc88d933a/collection/34416366-34021373-0373-4e49-81e6-97f9bd96a55c?action=share&source=collection_link&creator=34416366"
+	},
+	"item": [
+		{
+			"name": "Save EndpointHit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"app\": \"ewm-main-service\",\r\n  \"uri\": \"/events/1\",\r\n  \"ip\": \"192.163.0.1\",\r\n  \"timestamp\": \"2022-09-06 11:00:23\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9090/hit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"hit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save 2 EndpointHit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"app\": \"ewm-main-service\",\r\n  \"uri\": \"/events/1\",\r\n  \"ip\": \"192.163.0.1\",\r\n  \"timestamp\": \"2023-09-06 11:00:23\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9090/hit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"hit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get 1 Hit (Unique IP)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/stats?start=2021-09-06 12:00:00&end=2024-09-06 12:00:00&uris=/events/1&unique=true",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"stats"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "2021-09-06 12:00:00"
+						},
+						{
+							"key": "end",
+							"value": "2024-09-06 12:00:00"
+						},
+						{
+							"key": "uris",
+							"value": "/events/1"
+						},
+						{
+							"key": "unique",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get 2 Hits",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/stats?start=2021-09-06 12:00:00&end=2024-09-06 12:00:00&uris=/events/1&unique=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"stats"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "2021-09-06 12:00:00"
+						},
+						{
+							"key": "end",
+							"value": "2024-09-06 12:00:00"
+						},
+						{
+							"key": "uris",
+							"value": "/events/1"
+						},
+						{
+							"key": "unique",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get 0 Hits",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/stats?start=2024-09-06 12:00:00&end=2024-09-06 12:00:00&uris=/events/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"stats"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "2024-09-06 12:00:00"
+						},
+						{
+							"key": "end",
+							"value": "2024-09-06 12:00:00"
+						},
+						{
+							"key": "uris",
+							"value": "/events/1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Hits for 2 URIs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/stats?start=2021-09-06 12:00:00&end=2024-09-06 12:00:00&uris=/events,/events/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"stats"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "2021-09-06 12:00:00"
+						},
+						{
+							"key": "end",
+							"value": "2024-09-06 12:00:00"
+						},
+						{
+							"key": "uris",
+							"value": "/events,/events/1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
