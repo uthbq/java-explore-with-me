@@ -26,13 +26,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
     @Override
-    @Transactional
     public RequestDto create(long userId, long eventId) {
         User requester = userRepository.findById(userId).orElseThrow(NotFoundException::new);
         Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
@@ -84,7 +84,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
     public RequestDto cancel(long userId, long requestId) {
         userRepository.findById(userId).orElseThrow(NotFoundException::new);
         Request request = requestRepository.findById(requestId).orElseThrow(NotFoundException::new);
@@ -109,7 +108,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
     public RequestStatusUpdate confirmRequests(long userId, long eventId, RequestUpdateDto dto) {
         Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
         List<Request> confirmedRequests = requestRepository.findAllByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
@@ -120,8 +118,10 @@ public class RequestServiceImpl implements RequestService {
             }
             requests = requests.stream().filter(request -> request.getStatus() == RequestStatus.PENDING).toList();
             if (!requests.isEmpty()) {
-                if (dto.getStatus().equals("CONFIRMED")) {
-                    requests = requests.stream().peek(request -> request.setStatus(RequestStatus.CONFIRMED)).toList();
+                if (dto.getStatus().equals(RequestStatus.CONFIRMED.name())) {
+                    requests = requests.stream()
+                            .peek(request -> request.setStatus(RequestStatus.CONFIRMED))
+                            .toList();
                     for (Request request : requests) {
                         if (confirmedRequests.size() == request.getEvent().getParticipantLimit()) {
                             throw new InvalidDataException("Превышен лимит участников для этого события!");

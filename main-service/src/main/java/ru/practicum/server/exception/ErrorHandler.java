@@ -46,4 +46,12 @@ public class ErrorHandler {
         log.error("Произошел конфликт в БД");
         return new ErrorBody(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorBody handleThrowable(final Throwable e) {
+        log.error("Внутренняя ошибка сервера: {}", e.getMessage(), e);
+        return new ErrorBody("Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.");
+    }
+
 }

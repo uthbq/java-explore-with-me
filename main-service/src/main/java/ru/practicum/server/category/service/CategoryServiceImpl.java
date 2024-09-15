@@ -18,11 +18,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    @Transactional
     public Category create(CategoryDto catDto) {
         Category category = categoryRepository.save(CategoryMapper.mapToCategory(catDto));
         log.info("POST /admin/categories -> returning from db {}", category);
@@ -30,7 +30,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
     public void delete(long catId) {
         categoryRepository.findById(catId).orElseThrow(NotFoundException::new);
         categoryRepository.deleteById(catId);
@@ -38,7 +37,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
     public Category patch(long catId, CategoryDto catDto) {
         Category categoryToSave = CategoryMapper.mapToCategory(catDto);
         categoryToSave.setId(catId);
