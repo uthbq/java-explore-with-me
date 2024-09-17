@@ -30,4 +30,12 @@ public interface EventService {
                                       LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                       Boolean onlyAvailable, EventSearch sort, int from, int size,
                                       HttpServletRequest servletRequest);
+
+    Event like(long userId, long eventId, long likerId);
+
+    void removeLike(long userId, long eventId, long likerId);
+
+    Event dislike(long userId, long eventId, long dislikerId);
+
+    void removeDislike(long userId, long eventId, long dislikerId);
 }

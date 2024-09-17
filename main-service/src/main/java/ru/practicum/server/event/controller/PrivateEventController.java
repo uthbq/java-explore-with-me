@@ -44,4 +44,32 @@ public class PrivateEventController {
         log.info("PATCH /users/{}/events/{} <- {}", userId, eventId, eventDto);
         return eventService.update(userId, eventId, eventDto);
     }
+
+    @PostMapping("/{userId}/events/{eventId}/like")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Event like(@PathVariable long userId, @PathVariable long eventId, @RequestParam long likerId) {
+        log.info("POST /users/{}/events/{}/like <- with likerId={}", userId, eventId, likerId);
+        return eventService.like(userId, eventId, likerId);
+    }
+
+    @DeleteMapping("/{userId}/events/{eventId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeLike(@PathVariable long userId, @PathVariable long eventId, @RequestParam long likerId) {
+        log.info("DELETE /users/{}/events/{}/like <- with likerId={}", userId, eventId, likerId);
+        eventService.removeLike(userId, eventId, likerId);
+    }
+
+    @PostMapping("/{userId}/events/{eventId}/dislike")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Event dislike(@PathVariable long userId, @PathVariable long eventId, @RequestParam long dislikerId) {
+        log.info("POST /users/{}/events/{}/dislike <- with likerId={}", userId, eventId, dislikerId);
+        return eventService.dislike(userId, eventId, dislikerId);
+    }
+
+    @DeleteMapping("/{userId}/events/{eventId}/dislike")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeDislike(@PathVariable long userId, @PathVariable long eventId, @RequestParam long dislikerId) {
+        log.info("DELETE /users/{}/events/{}/dislike <- with likerId={}", userId, eventId, dislikerId);
+        eventService.removeDislike(userId, eventId, dislikerId);
+    }
 }
