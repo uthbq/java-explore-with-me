@@ -8,7 +8,6 @@ import ru.practicum.models.dto.ViewStats;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 public interface HitRepository extends JpaRepository<EndpointHit, Long> {
 
     @Query("SELECT new ru.practicum.models.dto.ViewStats(eh.app, eh.uri, count(eh.id)) FROM EndpointHit AS eh WHERE eh.timestamp BETWEEN ?1 AND ?2 GROUP BY eh.app, eh.uri")
@@ -24,3 +23,4 @@ public interface HitRepository extends JpaRepository<EndpointHit, Long> {
     List<ViewStats> getViewStatsForUrisUnique(LocalDateTime start, LocalDateTime end, List<String> uris);
 
 }
+

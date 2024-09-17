@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.models.dto.EndpointHitDto;
 import ru.practicum.models.dto.ViewStats;
+import ru.practicum.service.exception.IncorrectDateException;
 import ru.practicum.service.model.mapper.EndpointHitMapper;
 import ru.practicum.service.repository.HitRepository;
 
@@ -27,10 +28,12 @@ public class MainService {
 
     @Transactional(readOnly = true)
     public List<ViewStats> getViewStats(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
+        if (start.isAfter(end)) {
+            throw new IncorrectDateException("Даты были введены неверно!");
+        }
         List<ViewStats> viewStatsList;
 
         if (uris == null) {
-            // Если URI не указаны, получаем все статистики.
             if (unique) {
                 viewStatsList = repository.getAllViewStatsUnique(start, end);
             } else {
@@ -51,4 +54,3 @@ public class MainService {
     }
 
 }
-
