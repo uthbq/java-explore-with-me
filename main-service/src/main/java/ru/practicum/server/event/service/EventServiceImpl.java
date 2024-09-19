@@ -75,6 +75,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public void removeDislike(long userId, long eventId, long dislikerId) {
+        eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        userRepository.findById(dislikerId).orElseThrow(NotFoundException::new);
+        likeRepository.deleteById(new LikeInfoId(eventId, dislikerId));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Event get(long userId, long eventId) {
         userRepository.findById(userId).orElseThrow(NotFoundException::new);
