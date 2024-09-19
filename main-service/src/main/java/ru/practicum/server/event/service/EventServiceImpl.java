@@ -22,6 +22,8 @@ import ru.practicum.server.event.repository.EventRepository;
 import ru.practicum.server.exception.IncorrectDateException;
 import ru.practicum.server.exception.InvalidDataException;
 import ru.practicum.server.exception.NotFoundException;
+import ru.practicum.server.like.model.LikeInfo;
+import ru.practicum.server.like.model.LikeInfoId;
 import ru.practicum.server.like.repository.LikeRepository;
 import ru.practicum.server.user.model.User;
 import ru.practicum.server.user.repository.UserRepository;
