@@ -1,20 +1,18 @@
 package ru.practicum.server.like.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import ru.practicum.server.like.model.LikeInfo;
-import ru.practicum.server.like.model.LikeInfoId;
 
-public interface LikeRepository extends JpaRepository<LikeInfo, LikeInfoId> {
-    @Query(value = "SELECT SUM(positive) " +
-                    "FROM LikeInfo " +
-                    "WHERE eventId = ?1")
+import java.util.List;
+import java.util.Map;
+
+public interface LikeRepository extends CrudRepository<LikeInfo, Long> {
+
+    @Query("SELECT SUM(l.positive) FROM LikeInfo l WHERE l.eventId = :eventId")
     Integer findRatingByEventId(Long eventId);
 
-    @Query(value = "SELECT li.eventId, SUM(li.positive) " +
-            "FROM LikeInfo li " +
-            "WHERE li.eventId IN :eventIds " +
-            "GROUP BY li.eventId")
+    @Query("SELECT l.eventId, SUM(l.positive) FROM LikeInfo l WHERE l.eventId IN :eventIds GROUP BY l.eventId")
     Map<Long, Integer> findRatingsByEventIds(List<Long> eventIds);
-
 }
+

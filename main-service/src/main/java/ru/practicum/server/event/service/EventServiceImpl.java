@@ -22,8 +22,6 @@ import ru.practicum.server.event.repository.EventRepository;
 import ru.practicum.server.exception.IncorrectDateException;
 import ru.practicum.server.exception.InvalidDataException;
 import ru.practicum.server.exception.NotFoundException;
-import ru.practicum.server.like.model.LikeInfo;
-import ru.practicum.server.like.model.LikeInfoId;
 import ru.practicum.server.like.repository.LikeRepository;
 import ru.practicum.server.user.model.User;
 import ru.practicum.server.user.repository.UserRepository;
@@ -32,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -110,7 +109,6 @@ public class EventServiceImpl implements EventService {
         return events;
     }
 
-
     @Override
     public Event update(long userId, long eventId, EventDtoPatch eventDto) {
         userRepository.findById(userId).orElseThrow(NotFoundException::new);
@@ -118,15 +116,11 @@ public class EventServiceImpl implements EventService {
         if (old.getState() == EventState.PUBLISHED) {
             throw new InvalidDataException("Вы уже не можете изменить это событие!");
         }
-        if (eventDto.getDescription() != null) {
-            if (eventDto.getDescription().isBlank()) {
-                throw new InvalidDataException("Вы неверно ввели описание события");
-            }
+        if (eventDto.getDescription() != null && eventDto.getDescription().isBlank()) {
+            throw new InvalidDataException("Вы неверно ввели описание события");
         }
-        if (eventDto.getAnnotation() != null) {
-            if (eventDto.getAnnotation().isBlank()) {
-                throw new InvalidDataException("Вы неверно ввели описание события");
-            }
+        if (eventDto.getAnnotation() != null && eventDto.getAnnotation().isBlank()) {
+            throw new InvalidDataException("Вы неверно ввели описание события");
         }
         checkCorrectEventDate(eventDto.getEventDate());
         if (eventDto.getCategory() != null) {
@@ -137,12 +131,11 @@ public class EventServiceImpl implements EventService {
         if (eventDto.getStateAction() != null) {
             if (eventDto.getStateAction().equals("CANCEL_REVIEW")) {
                 event.setState(EventState.CANCELED);
-            }
-            if (eventDto.getStateAction().equals("SEND_TO_REVIEW")) {
+            } else if (eventDto.getStateAction().equals("SEND_TO_REVIEW")) {
                 event.setState(EventState.PENDING);
             }
         }
-        Event saved = eventRepository.save(EventMapper.updateEvent(old, eventDto));
+        Event saved = eventRepository.save(event);
         Integer rating = likeRepository.findRatingByEventId(event.getId());
         event.setRating(Objects.requireNonNullElse(rating, 0));
         log.info("PATCH /users/{}/events/{} -> returning from db {}", userId, eventId, saved);
@@ -158,15 +151,11 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != EventState.PENDING) {
             throw new InvalidDataException("Это событие уже нельзя обновить!");
         }
-        if (eventDto.getDescription() != null) {
-            if (eventDto.getDescription().isBlank()) {
-                throw new InvalidDataException("Вы неверно ввели описание события");
-            }
+        if (eventDto.getDescription() != null && eventDto.getDescription().isBlank()) {
+            throw new InvalidDataException("Вы неверно ввели описание события");
         }
-        if (eventDto.getAnnotation() != null) {
-            if (eventDto.getAnnotation().isBlank()) {
-                throw new InvalidDataException("Вы неверно ввели описание события");
-            }
+        if (eventDto.getAnnotation() != null && eventDto.getAnnotation().isBlank()) {
+            throw new InvalidDataException("Вы неверно ввели описание события");
         }
 
         Event updated = EventMapper.updateEvent(event, eventDto);
@@ -220,20 +209,16 @@ public class EventServiceImpl implements EventService {
         return events;
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public Event publicGet(long eventId, HttpServletRequest servletRequest) {
         statsClient.postHit(new EndpointHitDto("ewm-main-service", servletRequest.getRequestURI(), servletRequest.getRemoteAddr(), LocalDateTime.now()));
         Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        if (event.getState() != EventState.PUBLISHED) {
-            throw new NotFoundException("Событие с таким id не найдено!");
-        }
         event.setViews(event.getViews() + 1);
         eventRepository.save(event);
         Integer rating = likeRepository.findRatingByEventId(event.getId());
         event.setRating(Objects.requireNonNullElse(rating, 0));
-        log.info("/GET /events/{} -> returning from db {}", eventId, event);
+        log.info("GET /events/{} -> returning from db {}", eventId, event);
         return event;
     }
 
@@ -281,54 +266,5 @@ public class EventServiceImpl implements EventService {
 
         log.info("GET /events -> returning from db");
         return events;
-    }
-
-
-    @Override
-    public Event like(long userId, long eventId, long likerId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        if (event.getState() != EventState.PUBLISHED) {
-            throw new InvalidDataException("Это событие еще не было опубликовано!");
-        }
-        userRepository.findById(likerId).orElseThrow(NotFoundException::new);
-        if (event.getInitiator().getId() == likerId) {
-            throw new InvalidDataException("Вы не можете лайкнуть собственное событие!");
-        }
-        likeRepository.save(new LikeInfo(eventId, likerId, 1));
-        Integer rating = likeRepository.findRatingByEventId(event.getId());
-        event.setRating(Objects.requireNonNullElse(rating, 0));
-        log.info("POST /users/{}/events/{}/like -> returning {} from db", userId, eventId, event);
-        return event;
-    }
-
-    @Override
-    public void removeLike(long userId, long eventId, long likerId) {
-        eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        userRepository.findById(likerId).orElseThrow(NotFoundException::new);
-        likeRepository.deleteById(new LikeInfoId(eventId, likerId));
-    }
-
-    @Override
-    public Event dislike(long userId, long eventId, long dislikerId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        if (event.getState() != EventState.PUBLISHED) {
-            throw new InvalidDataException("Это событие еще не было опубликовано!");
-        }
-        userRepository.findById(dislikerId).orElseThrow(NotFoundException::new);
-        if (event.getInitiator().getId() == dislikerId) {
-            throw new InvalidDataException("Вы не можете лайкнуть собственное событие!");
-        }
-        likeRepository.save(new LikeInfo(eventId, dislikerId, -1));
-        Integer rating = likeRepository.findRatingByEventId(event.getId());
-        event.setRating(Objects.requireNonNullElse(rating, 0));
-        log.info("POST /users/{}/events/{}/dislike -> returning {} from db", userId, eventId, event);
-        return event;
-    }
-
-    @Override
-    public void removeDislike(long userId, long eventId, long dislikerId) {
-        eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
-        userRepository.findById(dislikerId).orElseThrow(NotFoundException::new);
-        likeRepository.deleteById(new LikeInfoId(eventId, dislikerId));
     }
 }
