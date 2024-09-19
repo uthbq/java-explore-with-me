@@ -32,10 +32,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor
@@ -97,13 +94,17 @@ public class EventServiceImpl implements EventService {
         userRepository.findById(userId).orElseThrow(NotFoundException::new);
         Pageable pageable = PageRequest.of(from / size, size);
         List<Event> events = eventRepository.findByInitiatorId(userId, pageable);
-        List<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toList());
-        Map<Long, Integer> ratingsMap = likeRepository.findRatingsByEventIds(eventIds);
 
-        events.forEach(event -> {
-            Integer rating = ratingsMap.get(event.getId());
-            event.setRating(Objects.requireNonNullElse(rating, 0));
-        });
+        // Получаем список id всех событий
+        List<Long> eventIds = events.stream().map(Event::getId).toList();
+
+        // Получаем рейтинг для всех событий одним запросом
+        Map<Long, Integer> ratings = likeRepository.findRatingsByEventIds(eventIds);
+
+        // Устанавливаем рейтинг для каждого события
+        for (Event event : events) {
+            event.setRating(Objects.requireNonNullElse(ratings.get(event.getId()), 0));
+        }
 
         log.info("GET /users/{}/events ->", userId);
         return events;
@@ -193,7 +194,6 @@ public class EventServiceImpl implements EventService {
                                       LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                       int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size);
-
         if (states == null) {
             states = EventState.values();
         }
@@ -203,15 +203,17 @@ public class EventServiceImpl implements EventService {
         if (rangeEnd == null) {
             rangeEnd = LocalDateTime.now().plusYears(100);
         }
-
         List<Event> events = eventRepository.adminGet(users, states, categories, rangeStart, rangeEnd, pageable);
+
+        // Получаем список id всех событий
         List<Long> eventIds = events.stream().map(Event::getId).toList();
-        List<LikeInfo> ratings = likeRepository.findRatingsByEventIds(eventIds);
-        Map<Long, Integer> ratingMap = ratings.stream()
-                .collect(Collectors.toMap(LikeInfo::getEventId, LikeInfo::getRating));
+
+        // Получаем рейтинг для всех событий одним запросом
+        Map<Long, Integer> ratings = likeRepository.findRatingsByEventIds(eventIds);
+
+        // Устанавливаем рейтинг для каждого события
         for (Event event : events) {
-            Integer rating = ratingMap.getOrDefault(event.getId(), 0);
-            event.setRating(rating);
+            event.setRating(Objects.requireNonNullElse(ratings.get(event.getId()), 0));
         }
 
         log.info("GET /admin/events -> returning from db");
@@ -239,7 +241,9 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public Collection<Event> publicGetSorted(String text, Long[] categories, Boolean paid, LocalDateTime rangeStart,
                                              LocalDateTime rangeEnd, Boolean onlyAvailable, EventSearch sort,
-                                             int from, int size, HttpServletRequest servletRequest) {statsClient.postHit(new EndpointHitDto("ewm-main-service", servletRequest.getRequestURI(), servletRequest.getRemoteAddr(), LocalDateTime.now()));
+                                             int from, int size, HttpServletRequest servletRequest) {
+        statsClient.postHit(new EndpointHitDto("ewm-main-service", servletRequest.getRequestURI(), servletRequest.getRemoteAddr(), LocalDateTime.now()));
+
         String sortBy;
         switch (sort) {
             case EVENT_DATE -> sortBy = "eventDate";
@@ -259,14 +263,18 @@ public class EventServiceImpl implements EventService {
         } else {
             events = eventRepository.getEventsFiltered(text, categories, paid, rangeStart, rangeEnd, pageable);
         }
+
+        // Получаем список id всех событий
         List<Long> eventIds = events.stream().map(Event::getId).toList();
-        List<LikeInfo> ratings = likeRepository.findRatingsByEventIds(eventIds);
-        Map<Long, Integer> ratingMap = ratings.stream()
-                .collect(Collectors.toMap(LikeInfo::getEventId, LikeInfo::getRating));
+
+        // Получаем рейтинг для всех событий одним запросом
+        Map<Long, Integer> ratings = likeRepository.findRatingsByEventIds(eventIds);
+
+        // Устанавливаем рейтинг для каждого события
         for (Event event : events) {
-            Integer rating = ratingMap.getOrDefault(event.getId(), 0);
-            event.setRating(rating);
+            event.setRating(Objects.requireNonNullElse(ratings.get(event.getId()), 0));
         }
+
         if (sort == EventSearch.RATING) {
             events.sort(Comparator.comparing(Event::getRating).reversed());
         }
