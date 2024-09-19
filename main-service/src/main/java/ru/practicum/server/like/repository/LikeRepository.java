@@ -10,4 +10,12 @@ public interface LikeRepository extends JpaRepository<LikeInfo, LikeInfoId> {
                     "FROM LikeInfo " +
                     "WHERE eventId = ?1")
     Integer findRatingByEventId(Long eventId);
+
+    @Query(value = "SELECT eventId, SUM(positive) FROM LikeInfo WHERE eventId IN :eventIds GROUP BY eventId")
+    Map<Long, Integer> findRatingsByEventIds(List<Long> eventIds);
+
+    @Query("SELECT new ru.practicum.server.like.model.LikeInfo(eventId, SUM(positive)) " +
+            "FROM LikeInfo WHERE eventId IN :eventIds GROUP BY eventId")
+    List<LikeInfo> findRatingsByEventIds(List<Long> eventIds);
+
 }
