@@ -82,6 +82,47 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public Event like(long userId, long eventId, long likerId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new InvalidDataException("Это событие еще не было опубликовано!");
+        }
+        userRepository.findById(likerId).orElseThrow(NotFoundException::new);
+        if (event.getInitiator().getId() == likerId) {
+            throw new InvalidDataException("Вы не можете лайкнуть собственное событие!");
+        }
+        likeRepository.save(new LikeInfo(eventId, likerId, 1));
+        Integer rating = likeRepository.findRatingByEventId(event.getId());
+        event.setRating(Objects.requireNonNullElse(rating, 0));
+        log.info("POST /users/{}/events/{}/like -> returning {} from db", userId, eventId, event);
+        return event;
+    }
+
+    @Override
+    public void removeLike(long userId, long eventId, long likerId) {
+        eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        userRepository.findById(likerId).orElseThrow(NotFoundException::new);
+        likeRepository.deleteById(new LikeInfoId(eventId, likerId));
+    }
+
+    @Override
+    public Event dislike(long userId, long eventId, long dislikerId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(NotFoundException::new);
+        if (event.getState() != EventState.PUBLISHED) {
+            throw new InvalidDataException("Это событие еще не было опубликовано!");
+        }
+        userRepository.findById(dislikerId).orElseThrow(NotFoundException::new);
+        if (event.getInitiator().getId() == dislikerId) {
+            throw new InvalidDataException("Вы не можете лайкнуть собственное событие!");
+        }
+        likeRepository.save(new LikeInfo(eventId, dislikerId, -1));
+        Integer rating = likeRepository.findRatingByEventId(event.getId());
+        event.setRating(Objects.requireNonNullElse(rating, 0));
+        log.info("POST /users/{}/events/{}/dislike -> returning {} from db", userId, eventId, event);
+        return event;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Event get(long userId, long eventId) {
         userRepository.findById(userId).orElseThrow(NotFoundException::new);
