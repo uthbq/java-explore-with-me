@@ -52,3 +52,11 @@ CREATE TABLE IF NOT EXISTS compilations_events (
     events_id BIGINT NOT NULL REFERENCES events (id) ON DELETE SET NULL,
     compilation_id BIGINT REFERENCES compilations (id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS events_likes (
+    event_id BIGINT NOT NULL REFERENCES events (id) ON DELETE SET NULL,
+    estimater_id BIGINT REFERENCES users (id) ON DELETE CASCADE,
+    positive INTEGER,
+    CONSTRAINT pk_likes PRIMARY KEY (event_id, estimater_id),
+    CONSTRAINT positive_values CHECK (positive = 1 OR positive = -1)
+);

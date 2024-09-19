@@ -1,0 +1,430 @@
+{
+	"info": {
+		"_postman_id": "7bf140a5-4bb7-47bf-a0e0-eda2314337ca",
+		"name": "Feature Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34416366",
+		"_collection_link": "https://yandex-practicum-5899.postman.co/workspace/Yandex-Practicum-Workspace~54fe1260-13d0-4dc4-892e-eb6dc88d933a/collection/34416366-7bf140a5-4bb7-47bf-a0e0-eda2314337ca?action=share&source=collection_link&creator=34416366"
+	},
+	"item": [
+		{
+			"name": "Create User 138",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"jdajikdwdwauh\",\r\n    \"email\": \"koadwijidjwiaijdawi@yandex.ru\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/admin/users",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Event 107",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"вечеринка на пляже\",\r\n    \"annotation\": \"веселая вечеринка, которая вам понравится\",\r\n    \"category\": 2,\r\n    \"description\": \"веселая вечеринка на берегу моря\",\r\n    \"eventDate\": \"2024-10-20 12:30:00\",\r\n    \"location\": {\r\n        \"lat\": 20,\r\n        \"lon\": 40\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/138/events",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"138",
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Like Event 107 Before Publish (Fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.have.status(409);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/138/events/107/like?likerId=20",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"138",
+						"events",
+						"107",
+						"like"
+					],
+					"query": [
+						{
+							"key": "likerId",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Publish Event 107",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"stateAction\": \"PUBLISH_EVENT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/admin/events/107",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"events",
+						"107"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Like own Event (Fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.have.status(409);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/138/events/107/like?likerId=138",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"138",
+						"events",
+						"107",
+						"like"
+					],
+					"query": [
+						{
+							"key": "likerId",
+							"value": "138"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Like Event 107",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/138/events/107/like?likerId=20",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"138",
+						"events",
+						"107",
+						"like"
+					],
+					"query": [
+						{
+							"key": "likerId",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove Like",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.have.status(204);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/138/events/107/like?likerId=20",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"138",
+						"events",
+						"107",
+						"like"
+					],
+					"query": [
+						{
+							"key": "likerId",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dislike Event 107",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/users/138/events/107/dislike?dislikerId=20",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"138",
+						"events",
+						"107",
+						"dislike"
+					],
+					"query": [
+						{
+							"key": "dislikerId",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove Dislike",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.have.status(204);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/users/138/events/107/dislike?dislikerId=20",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"138",
+						"events",
+						"107",
+						"dislike"
+					],
+					"query": [
+						{
+							"key": "dislikerId",
+							"value": "20"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get events sorted by rating",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.response.to.be.success;\r",
+							"pm.response.to.be.withBody;\r",
+							"pm.response.to.be.json;"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/events?sort=RATING",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events"
+					],
+					"query": [
+						{
+							"key": "sort",
+							"value": "RATING"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

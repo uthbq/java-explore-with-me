@@ -46,5 +46,4 @@ public class ErrorHandler {
         log.error("Произошел конфликт в БД");
         return new ErrorBody(e.getMessage());
     }
-
 }

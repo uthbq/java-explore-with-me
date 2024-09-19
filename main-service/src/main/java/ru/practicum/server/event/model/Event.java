@@ -75,6 +75,9 @@ public class Event {
     @Column(name = "views")
     private Integer views;
 
+    @Transient
+    private Integer rating;
+
     public Event(String title, String annotation, String description, LocalDateTime eventDate, Location location, Boolean paid, Integer participantLimit, Boolean requestModeration) {
         this.title = title;
         this.annotation = annotation;
